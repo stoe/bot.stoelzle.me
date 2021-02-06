@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@now/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "index.js"
+    }
+  ],
+  "public": false,
+  "env": {
+    "NODE_ENV": "production",
+    "LOG_LEVEL": "info",
+    "APP_NAME": "bot.stoelzle.me",
+    "APP_ID": "@bot_app_id",
+    "WEBHOOK_SECRET": "@bot_webhook_secret",
+    "PRIVATE_KEY": "@bot_private_key"
+  },
+  "github": {
+    "enabled": true,
+    "silent": true
+  }
+}
