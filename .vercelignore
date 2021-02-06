@@ -1,0 +1,6 @@
+.github/
+node_modules/
+.editorconfig
+.env
+.nvmrc
+private-key.pem

@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/index.js": {
+      "memory": 1024
+    }
+  },
+  "rewrites": [{"source": "/", "destination": "/api"}],
+  "public": false,
+  "github": {
+    "enabled": true,
+    "silent": true
+  }
+}
