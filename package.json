@@ -4,16 +4,12 @@
   "version": "1.0.0",
   "keywords": [],
   "author": {
-    "name": "Stefan Stölzle",
+    "name": "Stefan StÃ¶lzle",
     "email": "stoe@github.com",
     "url": "https://github.com/stoe"
   },
   "license": "MIT",
-  "homepage": "https://github.com/stoe/bot.stoelzle.me#readme",
-  "repository": "git@github.com:stoe/bot.stoelzle.me.git",
-  "bugs": {
-    "url": "https://github.com/stoe/bot.stoelzle.me/issues"
-  },
+  "repository": "github:stoe/bot.stoelzle.me",
   "engines": {
     "node": ">=12",
     "npm": ">=6"
