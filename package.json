@@ -21,7 +21,7 @@
     "test": "eslint ./src/**/*.js"
   },
   "dependencies": {
-    "probot": "^11.0.6"
+    "probot": "^11.4.1"
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.4",
