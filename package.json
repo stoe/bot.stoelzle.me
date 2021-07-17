@@ -28,7 +28,7 @@
     "@vercel/node": "^1.11.1",
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-github": "^4.1.3",
+    "eslint-plugin-github": "^4.1.5",
     "nodemon": "^2.0.11",
     "smee-client": "^1.2.2"
   },
