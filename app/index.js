@@ -1,22 +1,22 @@
-const applyDefaultSettings = require('./settings')
 const applyDefaultBranchSettings = require('./branch')
+const applyDefaultSettings = require('./settings')
 
-module.exports = app => {
-  app.log(`bot.stoelzle.me 🤖 is alive`)
+module.exports = robot => {
+  robot.log(`bot.stoelzle.me 🤖 is alive`)
 
-  app.on('repository.created', async context => {
+  robot.on('repository.created', async context => {
     try {
       await applyDefaultSettings(context)
     } catch (error) {
-      app.log(error)
+      robot.log(error)
     }
   })
 
-  app.on('create', async context => {
+  robot.on('create', async context => {
     try {
       await applyDefaultBranchSettings(context)
     } catch (error) {
-      app.log(error)
+      robot.log(error)
     }
   })
 }
