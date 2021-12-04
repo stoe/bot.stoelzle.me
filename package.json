@@ -43,7 +43,7 @@
     }
   },
   "nodemonConfig": {
-    "exec": "probot run ./app/ndex.js",
+    "exec": "probot run ./app/index.js",
     "watch": [
       ".env",
       "app/"
