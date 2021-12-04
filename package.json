@@ -18,7 +18,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
-    "prepare": "husky install ./.github/husky",
+    "format": "npx prettier --config-precedence prefer-file --write . && eslint . --fix",
+    "prepare": "npx husky install ./.github/husky",
     "pretest": "npx eslint-config-prettier .eslintrc.json",
     "test": "eslint ."
   },
