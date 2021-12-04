@@ -12,7 +12,11 @@ const query = `mutation($repo: ID!) {
 
     requiresStatusChecks: true
     requiresStrictStatusChecks: true
-    requiredStatusCheckContexts: ["test"]
+    requiredStatusChecks: [{
+      # GitHub Actions
+      appId: "MDM6QXBwMTUzNjg="
+      context: "test / test"
+    }]
 
     requiresConversationResolution: true
 
