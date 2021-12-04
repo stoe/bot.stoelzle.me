@@ -1,7 +1,7 @@
 {
   "name": "@stoe/bot-stoelzle-me",
   "description": "My GitHub repo bot built with Probot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "script",
   "keywords": [],
   "author": {
