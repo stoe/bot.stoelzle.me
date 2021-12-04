@@ -1,6 +1,7 @@
 {
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 2018,
+    "sourceType": "script"
   },
   "env": {
     "es6": true,
@@ -9,6 +10,15 @@
   "plugins": ["github"],
   "extends": ["plugin:github/recommended"],
   "rules": {
-    "camelcase": ["error", {"properties": "never"}]
+    "camelcase": [
+      "error",
+      {
+        "properties": "never",
+        "allow": ["ref_type"]
+      }
+    ],
+    "import/extensions": "off",
+    "i18n-text/no-en": "off",
+    "import/no-commonjs": "off"
   }
 }
