@@ -18,6 +18,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
+    "prepare": "husky install ./.github/husky",
     "pretest": "npx eslint-config-prettier .eslintrc.json",
     "test": "eslint ."
   },
@@ -30,8 +31,15 @@
     "eslint": "^8.4.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-github": "^4.3.5",
+    "husky": "^7.0.4",
     "nodemon": "^2.0.15",
     "smee-client": "^1.2.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "./.github/husky/pre-commit",
+      "pre-push": "./.github/husky/pre-push"
+    }
   },
   "nodemonConfig": {
     "exec": "probot run ./app/ndex.js",
