@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.4",
-    "@vercel/node": "^1.12.1",
+    "@vercel/node": "^1.13.0",
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-github": "^4.3.5",
