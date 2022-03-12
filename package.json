@@ -24,7 +24,7 @@
     "test": "eslint ."
   },
   "dependencies": {
-    "probot": "^12.2.1"
+    "probot": "^12.2.2"
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.4",
