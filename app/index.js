@@ -1,5 +1,6 @@
 const applyDefaultBranchSettings = require('./branch')
 const applyDefaultSettings = require('./settings')
+const enableAutoMerge = require('./pr')
 
 module.exports = robot => {
   robot.log(`bot.stoelzle.me 🤖 is alive`)
@@ -15,6 +16,14 @@ module.exports = robot => {
   robot.on('create', async context => {
     try {
       await applyDefaultBranchSettings(context)
+    } catch (error) {
+      robot.log(error)
+    }
+  })
+
+  robot.on('pull_request.review_requested', async context => {
+    try {
+      await enableAutoMerge(context)
     } catch (error) {
       robot.log(error)
     }
