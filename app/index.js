@@ -1,5 +1,6 @@
 const applyDefaultBranchSettings = require('./branch')
 const applyDefaultSettings = require('./settings')
+const applyDefaultLabels = require('./labels')
 const enableAutoMerge = require('./pr')
 
 module.exports = robot => {
@@ -8,6 +9,7 @@ module.exports = robot => {
   robot.on('repository.created', async context => {
     try {
       await applyDefaultSettings(context)
+      await applyDefaultLabels(context)
     } catch (error) {
       robot.log(error)
     }
