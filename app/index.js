@@ -11,7 +11,7 @@ module.exports = robot => {
       await applyDefaultSettings(context)
       await applyDefaultLabels(context)
     } catch (error) {
-      robot.log(error)
+      robot.log.error(error.message)
     }
   })
 
@@ -19,7 +19,7 @@ module.exports = robot => {
     try {
       await applyDefaultBranchSettings(context)
     } catch (error) {
-      robot.log(error)
+      robot.log.error(error.message)
     }
   })
 
@@ -27,7 +27,7 @@ module.exports = robot => {
     try {
       await enableAutoMerge(context)
     } catch (error) {
-      robot.log(error)
+      robot.log.error(error.message)
     }
   })
 }
