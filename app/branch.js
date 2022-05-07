@@ -1,7 +1,10 @@
 // https://docs.github.com/en/graphql/reference/input-objects#createbranchprotectionruleinput
-const query = `mutation($repo: ID!) {
+const query = `mutation(
+  $repo: ID!,
+  $actors: [ID!] = []
+) {
   createBranchProtectionRule(input: {
-    clientMutationId: "stoe-bot-client-protection"
+    clientMutationId: "@stoe/bot-stoelzle-me"
     repositoryId: $repo
     pattern: "main"
 
@@ -12,24 +15,22 @@ const query = `mutation($repo: ID!) {
 
     requiresStatusChecks: true
     requiresStrictStatusChecks: true
-    requiredStatusChecks: [{
-      # GitHub Actions
-      appId: "MDM6QXBwMTUzNjg="
-      context: "test / test"
-    }]
+    requiredStatusCheckContexts: ["test / test"]
 
     requiresConversationResolution: true
 
-    requiresLinearHistory: true
-
     requiresCommitSignatures: true
 
-    isAdminEnforced: false
+    requiresLinearHistory: true
 
     restrictsPushes: false
 
+    isAdminEnforced: false
+
+    allowsForcePushes: true
+    bypassForcePushActorIds: $actors
+
     allowsDeletions: false
-    allowsForcePushes: false
   }) {
     clientMutationId
   }
@@ -44,18 +45,26 @@ module.exports = async context => {
     payload: {
       ref_type,
       ref: branch,
-      repository: {node_id: id}
+      repository: {
+        node_id: id,
+        owner: {type, node_id: actor}
+      }
     }
   } = context
   const {owner, repo} = context.repo()
 
   if (ref_type === 'branch' && branch === 'main') {
     try {
-      await octokit.graphql(query, {repo: id})
+      if (type === 'User') {
+        await octokit.graphql(query, {repo: id, actors: [actor]})
+      } else {
+        await octokit.graphql(query, {repo: id})
+      }
 
-      context.log.info(`Branch protection applied: ${owner}/${repo}:${branch}`)
+      context.log.info(`branch protection applied: ${owner}/${repo}:${branch}`)
     } catch (error) {
-      context.log.warn(`Branch protection already applied: ${owner}/${repo}:${branch}`)
+      context.log.warn(`branch protection already applied: ${owner}/${repo}:${branch}`)
+      context.log.error(error.message)
     }
   }
 }
