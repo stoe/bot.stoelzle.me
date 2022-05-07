@@ -26,9 +26,9 @@ module.exports = async context => {
       {pullRequestId}
     )
 
-    context.log.info(`Auto-merge enabled for ${html_url}`)
+    context.log.info(`auto-merge enabled for ${html_url}`)
   } catch (error) {
-    context.log.info(`Auto-merge not enabled for ${html_url}`)
+    context.log.warn(`auto-merge not enabled for ${html_url}`)
     context.log.error(error.message)
   }
 }
