@@ -36,6 +36,9 @@ module.exports = async context => {
       security_and_analysis: {
         secret_scanning: {
           status: 'enabled'
+        },
+        secret_scanning_push_protection: {
+          status: 'enabled'
         }
       }
     }
@@ -48,6 +51,7 @@ module.exports = async context => {
     if (config.security_and_analysis.secret_scanning && type === 'User') {
       // Secret Scanning can only be set on organization owned repositories
       delete config.security_and_analysis.secret_scanning
+      delete config.security_and_analysis.secret_scanning_push_protection
     }
 
     if (Object.keys(config.security_and_analysis).length === 0) {
