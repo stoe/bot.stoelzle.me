@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": "github:stoe/bot.stoelzle.me",
   "engines": {
-    "node": ">=14",
+    "node": ">=16",
     "npm": ">=7"
   },
   "main": "index.js",
