@@ -6,6 +6,9 @@ module.exports = async context => {
     octokit,
     payload: {
       pull_request: {node_id: pullRequestId, html_url, state, user},
+      repository: {
+        owner: {login: username, type}
+      },
       sender
     }
   } = context
@@ -14,17 +17,36 @@ module.exports = async context => {
   if (state !== 'open') return
 
   try {
-    await octokit.graphql(
-      `mutation($pullRequestId: ID!) {
-  enablePullRequestAutoMerge(input: {
-    pullRequestId: $pullRequestId
-    mergeMethod: SQUASH
-  }) {
-    pullRequest { title }
-  }
-}`,
-      {pullRequestId}
-    )
+    if (type === 'User') {
+      const {email} = await octokit.request('GET /users/{username}', {
+        username
+      })
+
+      await octokit.graphql(
+        `mutation($pullRequestId: ID!, $email: String) {
+    enablePullRequestAutoMerge(input: {
+      pullRequestId: $pullRequestId
+      mergeMethod: SQUASH
+      authorEmail: $email
+    }) {
+      pullRequest { title }
+    }
+  }`,
+        {pullRequestId, email}
+      )
+    } else {
+      await octokit.graphql(
+        `mutation($pullRequestId: ID!) {
+    enablePullRequestAutoMerge(input: {
+      pullRequestId: $pullRequestId
+      mergeMethod: SQUASH
+    }) {
+      pullRequest { title }
+    }
+  }`,
+        {pullRequestId}
+      )
+    }
 
     context.log.info(`auto-merge enabled for ${html_url}`)
   } catch (error) {
