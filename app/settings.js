@@ -29,6 +29,7 @@ module.exports = async context => {
       has_projects: false,
       has_wiki: false,
       allow_squash_merge: true,
+      use_squash_pr_title_as_default: true,
       allow_merge_commit: false,
       allow_rebase_merge: false,
       allow_auto_merge: true,
