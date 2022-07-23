@@ -24,16 +24,16 @@
     "test": "eslint ."
   },
   "dependencies": {
-    "probot": "^12.2.4"
+    "probot": "^12.2.5"
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.4",
-    "@vercel/node": "^2.0.0",
-    "eslint": "^8.18.0",
+    "@vercel/node": "^2.4.5",
+    "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-github": "^4.3.6",
+    "eslint-plugin-github": "^4.3.7",
     "husky": "^8.0.1",
-    "nodemon": "^2.0.18",
+    "nodemon": "^2.0.19",
     "smee-client": "^1.2.3"
   },
   "husky": {
