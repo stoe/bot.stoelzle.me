@@ -23,6 +23,14 @@ module.exports = robot => {
     }
   })
 
+  robot.on('pull_request.opened', async context => {
+    try {
+      await applyDefaultBranchSettings(context)
+    } catch (error) {
+      robot.log.error(error.message)
+    }
+  })
+
   robot.on('pull_request.review_requested', async context => {
     try {
       await enableAutoMerge(context)
