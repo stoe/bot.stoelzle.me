@@ -1,3 +1,5 @@
+const {setTimeout} = require('timers/promises')
+
 const LABLES = [
   {
     name: 'bug :bug:',
@@ -50,6 +52,9 @@ module.exports = async context => {
     per_page: 100,
   })
 
+  // sleep 1.5 seconds
+  await setTimeout(1500)
+
   const currentLabels = new Set(data.map(label => `${label.name} ${label.description} ${label.color}`))
   const wantLabels = new Set(LABLES.map(label => `${label.name} ${label.description} ${label.color}`))
 
@@ -66,6 +71,9 @@ module.exports = async context => {
         context.log.error(error.message)
       }
     }
+
+    // sleep 1.5 seconds
+    await setTimeout(1500)
   }
 
   // create missing labels
@@ -87,5 +95,8 @@ module.exports = async context => {
         context.log.error(error.message)
       }
     }
+
+    // sleep 1.5 seconds
+    await setTimeout(1500)
   }
 }

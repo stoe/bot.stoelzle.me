@@ -1,3 +1,5 @@
+const {setTimeout} = require('timers/promises')
+
 // https://docs.github.com/en/graphql/reference/input-objects#createbranchprotectionruleinput
 const getBranchProtectionQuery = `query(
   $owner: String!,
@@ -233,6 +235,9 @@ module.exports = async context => {
         }
       } else {
         for (const rule of rules) {
+          // sleep 1.5 seconds
+          await setTimeout(1500)
+
           const {pattern, id: branchProtectionRuleId, requiredStatusChecks} = rule
 
           if (requiredStatusChecks.length === 0) {
