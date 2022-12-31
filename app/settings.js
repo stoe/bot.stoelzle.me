@@ -7,12 +7,13 @@ module.exports = async context => {
     payload: {
       repository: {
         private,
-        owner: {type}
-      }
-    }
+        owner: {type},
+      },
+    },
   } = context
   const {owner, repo} = context.repo()
 
+  // settings
   try {
     // https://docs.github.com/en/rest/reference/repos#enable-vulnerability-alerts
     await octokit.request('PUT /repos/{owner}/{repo}/vulnerability-alerts', {owner, repo})
@@ -36,12 +37,14 @@ module.exports = async context => {
       delete_branch_on_merge: true,
       security_and_analysis: {
         secret_scanning: {
-          status: 'enabled'
+          status: 'enabled',
         },
         secret_scanning_push_protection: {
-          status: 'enabled'
-        }
-      }
+          status: 'enabled',
+        },
+      },
+      squash_merge_commit_message: 'COMMIT_MESSAGES',
+      squash_merge_commit_title: 'PR_TITLE',
     }
 
     if (config.security_and_analysis.secret_scanning && private === false) {
@@ -65,6 +68,34 @@ module.exports = async context => {
     context.log.info(`repository settings applied for: ${owner}/${repo}`)
   } catch (error) {
     context.log.warn(`repository settings partially/not applied for: ${owner}/${repo}`)
+    context.log.error(error.message)
+  }
+
+  // tags
+  const pattern = 'v*.*.*'
+
+  try {
+    // enable tag protection if not already enabled
+    // https://docs.github.com/en/rest/repos/tags#list-tag-protection-states-for-a-repository
+    const {data} = await octokit.request('GET /repos/{owner}/{repo}/tags/protection', {
+      owner,
+      repo,
+    })
+
+    if (data.length < 1 || data.every(d => d.pattern !== 'v*.*.*')) {
+      // https://docs.github.com/en/rest/repos/tags#create-a-tag-protection-state-for-a-repository
+      await octokit.request('POST /repos/{owner}/{repo}/tags/protection', {
+        owner,
+        repo,
+        pattern,
+      })
+
+      context.log.info(`tag protection ${pattern} applied for: ${owner}/${repo}`)
+    } else {
+      // do nothing
+    }
+  } catch (error) {
+    context.log.warn(`tag protection ${pattern} not applied for: ${owner}/${repo}`)
     context.log.error(error.message)
   }
 }
