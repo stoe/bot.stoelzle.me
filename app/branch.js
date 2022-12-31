@@ -155,14 +155,14 @@ module.exports = async context => {
     octokit,
     payload: {
       pull_request: {
-        base: {ref: branch}
+        base: {ref: branch},
       },
       repository: {
         node_id: id,
         owner: {type, node_id: actor},
-        language: lang
-      }
-    }
+        language: lang,
+      },
+    },
   } = context
   const {owner, repo} = context.repo()
   const language = lang ? lang.toLowerCase() : null
@@ -171,8 +171,8 @@ module.exports = async context => {
     // branch protection
     const {
       repository: {
-        branchProtectionRules: {nodes: rules}
-      }
+        branchProtectionRules: {nodes: rules},
+      },
     } = await octokit.graphql(getBranchProtectionQuery, {owner, repo})
 
     try {
@@ -192,7 +192,7 @@ module.exports = async context => {
             await octokit.graphql(updateBranchProtectionNoChecksQuery, {
               branchProtectionRuleId: id,
               pattern,
-              actors: [actor]
+              actors: [actor],
             })
             context.log.debug('branch protection updated')
             continue
@@ -202,7 +202,7 @@ module.exports = async context => {
             await octokit.graphql(updateBranchProtectionQuery, {
               branchProtectionRuleId,
               pattern,
-              actors: [actor]
+              actors: [actor],
             })
             context.log.debug('branch protection updated')
           }

@@ -7,10 +7,10 @@ const autoMerge = async context => {
     payload: {
       pull_request: {node_id: pullRequestId, html_url, state, user},
       repository: {
-        owner: {login: username, type}
+        owner: {login: username, type},
       },
-      sender
-    }
+      sender,
+    },
   } = context
 
   if (user.login !== 'dependabot[bot]' && user.type !== 'Bot' && user.login !== sender.login) return
@@ -19,7 +19,7 @@ const autoMerge = async context => {
   try {
     if (type === 'User') {
       const {email} = await octokit.request('GET /users/{username}', {
-        username
+        username,
       })
 
       await octokit.graphql(
@@ -32,7 +32,7 @@ const autoMerge = async context => {
       pullRequest { title }
     }
   }`,
-        {pullRequestId, email}
+        {pullRequestId, email},
       )
     } else {
       await octokit.graphql(
@@ -44,7 +44,7 @@ const autoMerge = async context => {
       pullRequest { title }
     }
   }`,
-        {pullRequestId}
+        {pullRequestId},
       )
     }
 
@@ -69,9 +69,9 @@ const autoApprove = async context => {
         status,
         conclusion,
         app: {slug},
-        check_suite: {pull_requests: prs}
-      }
-    }
+        check_suite: {pull_requests: prs},
+      },
+    },
   } = context
 
   const {owner, repo} = context.repo()
@@ -89,7 +89,7 @@ const autoApprove = async context => {
         number,
         head: {ref: headref, sha},
         base: {ref: baseref},
-        html_url: url
+        html_url: url,
       } = prs[0]
 
       if (baseref !== 'main' || !headref.includes('dependabot')) return
@@ -102,7 +102,7 @@ const autoApprove = async context => {
         pull_number: number,
         commit_id: sha,
         event: 'APPROVE',
-        body: 'Auto-approved :+1:'
+        body: 'Auto-approved :+1:',
       })
     }
   } catch (error) {
@@ -115,5 +115,5 @@ const autoApprove = async context => {
 
 module.exports = {
   autoMerge,
-  autoApprove
+  autoApprove,
 }

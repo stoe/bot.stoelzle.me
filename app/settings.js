@@ -7,9 +7,9 @@ module.exports = async context => {
     payload: {
       repository: {
         private,
-        owner: {type}
-      }
-    }
+        owner: {type},
+      },
+    },
   } = context
   const {owner, repo} = context.repo()
 
@@ -37,14 +37,14 @@ module.exports = async context => {
       delete_branch_on_merge: true,
       security_and_analysis: {
         secret_scanning: {
-          status: 'enabled'
+          status: 'enabled',
         },
         secret_scanning_push_protection: {
-          status: 'enabled'
-        }
+          status: 'enabled',
+        },
       },
       squash_merge_commit_message: 'COMMIT_MESSAGES',
-      squash_merge_commit_title: 'PR_TITLE'
+      squash_merge_commit_title: 'PR_TITLE',
     }
 
     if (config.security_and_analysis.secret_scanning && private === false) {
@@ -79,7 +79,7 @@ module.exports = async context => {
     // https://docs.github.com/en/rest/repos/tags#list-tag-protection-states-for-a-repository
     const {data} = await octokit.request('GET /repos/{owner}/{repo}/tags/protection', {
       owner,
-      repo
+      repo,
     })
 
     if (data.length < 1 || data.every(d => d.pattern !== 'v*.*.*')) {
@@ -87,7 +87,7 @@ module.exports = async context => {
       await octokit.request('POST /repos/{owner}/{repo}/tags/protection', {
         owner,
         repo,
-        pattern
+        pattern,
       })
 
       context.log.info(`tag protection ${pattern} applied for: ${owner}/${repo}`)
