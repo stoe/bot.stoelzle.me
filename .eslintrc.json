@@ -14,7 +14,7 @@
       "error",
       {
         "properties": "never",
-        "allow": ["html_url", "ref_type"]
+        "allow": ["html_url", "pull_request", "ref_type"]
       }
     ],
     "import/extensions": "off",

@@ -33,7 +33,7 @@ const createBranchProtectionQuery = `mutation(
     repositoryId: $repo
     pattern: "main"
 
-    requiresApprovingReviews: false
+    requiresApprovingReviews: true
     requiredApprovingReviewCount: 0
     requiresCodeOwnerReviews: true
     restrictsReviewDismissals: false
@@ -42,6 +42,46 @@ const createBranchProtectionQuery = `mutation(
     requiresStatusChecks: true
     requiresStrictStatusChecks: true
     requiredStatusCheckContexts: ["test / test", "test / test-matrix (16)"]
+
+    requiresConversationResolution: true
+
+    requiresCommitSignatures: true
+
+    requiresLinearHistory: true
+
+    restrictsPushes: false
+
+    isAdminEnforced: false
+
+    allowsForcePushes: false
+    bypassForcePushActorIds: $actors
+    bypassPullRequestActorIds: $actors
+
+    allowsDeletions: false
+  }) {
+    clientMutationId
+  }
+}`
+
+// https://docs.github.com/en/graphql/reference/input-objects#createbranchprotectionruleinput
+const createBranchProtectionNoChecksQuery = `mutation(
+  $repo: ID!,
+  $actors: [ID!] = []
+) {
+  createBranchProtectionRule(input: {
+    clientMutationId: "@stoe/octoherd-script-repo-settings"
+    repositoryId: $repo
+    pattern: "main"
+
+    requiresApprovingReviews: true
+    requiredApprovingReviewCount: 0
+    requiresCodeOwnerReviews: true
+    restrictsReviewDismissals: false
+    requireLastPushApproval: true
+
+    requiresStatusChecks: false
+    requiresStrictStatusChecks: false
+    requiredStatusCheckContexts: []
 
     requiresConversationResolution: true
 
@@ -154,9 +194,8 @@ module.exports = async context => {
   const {
     octokit,
     payload: {
-      pull_request: {
-        base: {ref: branch},
-      },
+      pull_request,
+      ref,
       repository: {
         node_id: id,
         owner: {type, node_id: actor},
@@ -166,6 +205,8 @@ module.exports = async context => {
   } = context
   const {owner, repo} = context.repo()
   const language = lang ? lang.toLowerCase() : null
+
+  const branch = pull_request && pull_request.base ? pull_request.base.ref : ref
 
   if (branch === 'main') {
     // branch protection
@@ -184,6 +225,12 @@ module.exports = async context => {
         }
 
         context.log.info(`branch protection applied: ${owner}/${repo}:${branch}`)
+      } else if (rules.length === 0) {
+        if (type === 'User') {
+          await octokit.graphql(createBranchProtectionNoChecksQuery, {repo: id, actors: [actor]})
+        } else {
+          await octokit.graphql(createBranchProtectionNoChecksQuery, {repo: id})
+        }
       } else {
         for (const rule of rules) {
           const {pattern, id: branchProtectionRuleId, requiredStatusChecks} = rule
