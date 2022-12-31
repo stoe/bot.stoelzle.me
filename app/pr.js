@@ -1,7 +1,7 @@
 /**
  * @param {import('probot').Context} context
  */
-module.exports = async context => {
+const autoMerge = async context => {
   const {
     octokit,
     payload: {
@@ -52,5 +52,68 @@ module.exports = async context => {
   } catch (error) {
     context.log.warn(`auto-merge not enabled for ${html_url}`)
     context.log.error(error.message)
+
+    throw error
   }
+}
+
+/**
+ * @param {import('probot').Context} context
+ */
+const autoApprove = async context => {
+  const {
+    octokit,
+    payload: {
+      check_run: {
+        name,
+        status,
+        conclusion,
+        app: {slug},
+        check_suite: {pull_requests: prs}
+      }
+    }
+  } = context
+
+  const {owner, repo} = context.repo()
+  let html_url
+
+  try {
+    if (
+      name === 'test / test' &&
+      status === 'completed' &&
+      conclusion === 'success' &&
+      slug === 'github-actions' &&
+      prs.length === 1
+    ) {
+      const {
+        number,
+        head: {ref: headref, sha},
+        base: {ref: baseref},
+        html_url: url
+      } = prs[0]
+
+      if (baseref !== 'main' || !headref.includes('dependabot')) return
+
+      html_url = url
+
+      await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
+        owner,
+        repo,
+        pull_number: number,
+        commit_id: sha,
+        event: 'APPROVE',
+        body: 'Auto-approved :+1:'
+      })
+    }
+  } catch (error) {
+    context.log.warn(`auto-approve failed for ${html_url}`)
+    context.log.error(error.message)
+
+    throw error
+  }
+}
+
+module.exports = {
+  autoMerge,
+  autoApprove
 }
