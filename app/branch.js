@@ -1,6 +1,5 @@
 const {setTimeout} = require('timers/promises')
 
-// https://docs.github.com/en/graphql/reference/input-objects#createbranchprotectionruleinput
 const getBranchProtectionQuery = `query(
   $owner: String!,
   $repo: String!
@@ -31,7 +30,7 @@ const createBranchProtectionQuery = `mutation(
   $actors: [ID!] = []
 ) {
   createBranchProtectionRule(input: {
-    clientMutationId: "@stoe/octoherd-script-repo-settings"
+    clientMutationId: "bot.stoelzle.me"
     repositoryId: $repo
     pattern: "main"
 
@@ -43,7 +42,7 @@ const createBranchProtectionQuery = `mutation(
 
     requiresStatusChecks: true
     requiresStrictStatusChecks: true
-    requiredStatusCheckContexts: ["test / test", "test / test-matrix (16)"]
+    requiredStatusCheckContexts: ["test / test-matrix (16)", "test / test"]
 
     requiresConversationResolution: true
 
@@ -71,7 +70,7 @@ const createBranchProtectionNoChecksQuery = `mutation(
   $actors: [ID!] = []
 ) {
   createBranchProtectionRule(input: {
-    clientMutationId: "@stoe/octoherd-script-repo-settings"
+    clientMutationId: "bot.stoelzle.me"
     repositoryId: $repo
     pattern: "main"
 
@@ -112,7 +111,7 @@ const updateBranchProtectionQuery = `mutation(
   $actors: [ID!] = []
 ) {
   updateBranchProtectionRule(input: {
-    clientMutationId: "@stoe/octoherd-script-repo-settings"
+    clientMutationId: "bot.stoelzle.me"
     branchProtectionRuleId: $branchProtectionRuleId
 
     pattern: $pattern
@@ -125,7 +124,7 @@ const updateBranchProtectionQuery = `mutation(
 
     requiresStatusChecks: true
     requiresStrictStatusChecks: true
-    requiredStatusCheckContexts: ["test / test", "test / test-matrix (16)"]
+    requiredStatusCheckContexts: ["test / test-matrix (16)", "test / test"]
 
     requiresConversationResolution: true
 
@@ -154,7 +153,7 @@ const updateBranchProtectionNoChecksQuery = `mutation(
   $actors: [ID!] = []
 ) {
   updateBranchProtectionRule(input: {
-    clientMutationId: "@stoe/octoherd-script-repo-settings"
+    clientMutationId: "bot.stoelzle.me"
     branchProtectionRuleId: $branchProtectionRuleId
 
     pattern: $pattern
@@ -199,10 +198,11 @@ module.exports = async context => {
       pull_request,
       ref,
       repository: {
-        node_id: id,
+        node_id: repoId,
         owner: {type, node_id: actor},
         language: lang,
       },
+      sender: {login: actorLogin, type: actorType},
     },
   } = context
   const {owner, repo} = context.repo()
@@ -218,50 +218,79 @@ module.exports = async context => {
       },
     } = await octokit.graphql(getBranchProtectionQuery, {owner, repo})
 
-    try {
-      if (rules.length === 0 && language === 'javascript') {
-        if (type === 'User') {
-          await octokit.graphql(createBranchProtectionQuery, {repo: id, actors: [actor]})
-        } else {
-          await octokit.graphql(createBranchProtectionQuery, {repo: id})
-        }
+    // sleep 1.5 seconds
+    await setTimeout(1500)
 
-        context.log.info(`branch protection applied: ${owner}/${repo}:${branch}`)
-      } else if (rules.length === 0) {
-        if (type === 'User') {
-          await octokit.graphql(createBranchProtectionNoChecksQuery, {repo: id, actors: [actor]})
-        } else {
-          await octokit.graphql(createBranchProtectionNoChecksQuery, {repo: id})
-        }
-      } else {
+    try {
+      const options = {
+        repo: repoId,
+      }
+
+      if (type === 'User' && actorLogin === 'stoe' && actorType === 'User') {
+        options.actors = [actor]
+      }
+
+      // determine if branch protection needs to be created or updated
+      const create = rules.length === 0
+      const update = rules.length > 0
+
+      // create
+      if (create && language === 'javascript') {
+        await octokit.graphql(createBranchProtectionQuery, options)
+
+        context.log.info(`🔒 create branch protectionfor ${owner}/${repo}`)
+      }
+
+      if (create && language !== 'javascript') {
+        await octokit.graphql(createBranchProtectionNoChecksQuery, options)
+
+        context.log.info(`🔒 create branch protectionfor ${owner}/${repo}`)
+      }
+
+      // update
+      if (update && language === 'javascript') {
         for (const rule of rules) {
+          const {pattern, id} = rule
+
+          if (['main', 'master'].includes(pattern)) {
+            await octokit.graphql(updateBranchProtectionQuery, {
+              branchProtectionRuleId: id,
+              pattern,
+              ...options,
+            })
+
+            context.log.info(`🔒 update branch protectionfor ${owner}/${repo}`)
+          }
+
           // sleep 1.5 seconds
           await setTimeout(1500)
+        }
+      }
 
-          const {pattern, id: branchProtectionRuleId, requiredStatusChecks} = rule
+      if (update && language !== 'javascript') {
+        for (const rule of rules) {
+          const {pattern, id, requiredStatusChecks} = rule
 
           if (requiredStatusChecks.length === 0) {
             await octokit.graphql(updateBranchProtectionNoChecksQuery, {
               branchProtectionRuleId: id,
               pattern,
-              actors: [actor],
+              ...options,
             })
-            context.log.debug('branch protection updated')
-            continue
-          }
 
-          if (pattern === 'main') {
-            await octokit.graphql(updateBranchProtectionQuery, {
-              branchProtectionRuleId,
-              pattern,
-              actors: [actor],
-            })
-            context.log.debug('branch protection updated')
+            context.log.info(`🔒 update branch protectionfor ${owner}/${repo}`)
           }
         }
+
+        // sleep 1.5 seconds
+        await setTimeout(1500)
+      }
+
+      if (!create && !update) {
+        context.log.info(`🙊 skipped branch protection for ${owner}/${repo}`)
       }
     } catch (error) {
-      context.log.warn(`branch protection already applied: ${owner}/${repo}:${branch}`)
+      context.log.warn(`🙈 branch protection already applied ${owner}/${repo}:${branch}`)
       context.log.error(error.message)
 
       throw error

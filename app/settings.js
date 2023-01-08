@@ -90,12 +90,12 @@ module.exports = async context => {
         pattern,
       })
 
-      context.log.info(`tag protection ${pattern} applied for: ${owner}/${repo}`)
+      context.log.info(`🔒 tag protection ${pattern} applied for ${owner}/${repo}`)
     } else {
-      // do nothing
+      context.log.info(`🙊 skipped tag protection for ${owner}/${repo}`)
     }
   } catch (error) {
-    context.log.warn(`tag protection ${pattern} not applied for: ${owner}/${repo}`)
+    context.log.warn(`❌ tag protection ${pattern} not applied for ${owner}/${repo}`)
     context.log.error(error.message)
   }
 }
