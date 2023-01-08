@@ -65,9 +65,9 @@ module.exports = async context => {
         // https://docs.github.com/en/rest/reference/issues#delete-a-label
         await octokit.request('DELETE /repos/{owner}/{repo}/labels/{name}', {owner, repo, name})
 
-        context.log.info(`label ${name} ${description} deleted`)
+        context.log.info(`🚮 label ${name} ${description} deleted for ${owner}/${repo}`)
       } catch (error) {
-        context.log.info(`label ${name} ${description} not deleted`)
+        context.log.info(`❌ label ${name} ${description} not deleted for ${owner}/${repo}`)
         context.log.error(error.message)
       }
     }
@@ -89,9 +89,9 @@ module.exports = async context => {
           description,
         })
 
-        context.log.info(`label ${name} ${description} created`)
+        context.log.info(`🆕 label ${name} ${description} created for ${owner}/${repo}`)
       } catch (error) {
-        context.log.info(`label ${name} ${description} not created`)
+        context.log.info(`❌ label ${name} ${description} not created for ${owner}/${repo}`)
         context.log.error(error.message)
       }
     }

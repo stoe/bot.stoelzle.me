@@ -5,7 +5,7 @@ const autoMerge = async context => {
   const {
     octokit,
     payload: {
-      pull_request: {node_id: pullRequestId, html_url, state, user},
+      pull_request: {node_id: pullRequestId, state, user},
       repository: {
         owner: {login: username, type},
       },
@@ -15,6 +15,8 @@ const autoMerge = async context => {
 
   if (user.login !== 'dependabot[bot]' && user.type !== 'Bot' && user.login !== sender.login) return
   if (state !== 'open') return
+
+  const {owner, repo} = context.repo()
 
   try {
     if (type === 'User') {
@@ -48,9 +50,9 @@ const autoMerge = async context => {
       )
     }
 
-    context.log.info(`auto-merge enabled for ${html_url}`)
+    context.log.info(`🤖 auto-merge enabled for ${owner}/${repo}`)
   } catch (error) {
-    context.log.warn(`auto-merge not enabled for ${html_url}`)
+    context.log.warn(`❌ auto-merge not enabled for ${owner}/${repo}`)
     context.log.error(error.message)
 
     throw error
@@ -71,15 +73,17 @@ const autoApprove = async context => {
         app: {slug},
         check_suite: {pull_requests: prs},
       },
+      sender: {login: actorLogin, type: actorType},
     },
   } = context
 
+  if (actorLogin !== 'dependabot[bot]' && actorType !== 'Bot') return
+
   const {owner, repo} = context.repo()
-  let html_url
 
   try {
     if (
-      name === 'test / test' &&
+      ['test', 'test / test'].includes(name.toLowerCase()) &&
       status === 'completed' &&
       conclusion === 'success' &&
       slug === 'github-actions' &&
@@ -89,12 +93,9 @@ const autoApprove = async context => {
         number,
         head: {ref: headref, sha},
         base: {ref: baseref},
-        html_url: url,
       } = prs[0]
 
       if (baseref !== 'main' || !headref.includes('dependabot')) return
-
-      html_url = url
 
       await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
         owner,
@@ -102,11 +103,13 @@ const autoApprove = async context => {
         pull_number: number,
         commit_id: sha,
         event: 'APPROVE',
-        body: 'Auto-approved :+1:',
+        body: `_🤖 auto-approved_`,
       })
+
+      context.log.info(`🤖 auto-approved ${owner}/${repo}#${number}`)
     }
   } catch (error) {
-    context.log.warn(`auto-approve failed for ${html_url}`)
+    context.log.warn(`❌ auto-approve failed for ${owner}/${repo}`)
     context.log.error(error.message)
 
     throw error
