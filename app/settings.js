@@ -43,8 +43,8 @@ module.exports = async context => {
           status: 'enabled',
         },
       },
-      squash_merge_commit_message: 'COMMIT_MESSAGES',
       squash_merge_commit_title: 'PR_TITLE',
+      squash_merge_commit_message: 'BLANK',
     }
 
     if (config.security_and_analysis.secret_scanning && private === false) {
