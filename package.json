@@ -1,7 +1,7 @@
 {
   "name": "@stoe/bot-stoelzle-me",
   "description": "My GitHub repo bot built with Probot",
-  "version": "3.3.2",
+  "version": "3.4.0",
   "type": "script",
   "keywords": [],
   "author": {
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.6",
-    "@vercel/node": "^2.13.0",
+    "@vercel/node": "^2.14.0",
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-github": "^4.7.0",
