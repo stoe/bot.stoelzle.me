@@ -63,57 +63,60 @@ const autoMerge = async context => {
  * @param {import('probot').Context} context
  */
 const autoApprove = async context => {
-  const {
-    octokit,
-    payload: {
-      check_run: {
-        name,
-        status,
-        conclusion,
-        app: {slug},
-        check_suite: {pull_requests: prs},
-      },
-      sender: {login: actorLogin, type: actorType},
-    },
-  } = context
+  context.log.warn('🛑 auto-approve disabled')
+  return
 
-  if (actorLogin !== 'dependabot[bot]' && actorType !== 'Bot') return
+  // const {
+  //   octokit,
+  //   payload: {
+  //     check_run: {
+  //       name,
+  //       status,
+  //       conclusion,
+  //       app: {slug},
+  //       check_suite: {pull_requests: prs},
+  //     },
+  //     sender: {login: actorLogin, type: actorType},
+  //   },
+  // } = context
 
-  const {owner, repo} = context.repo()
+  // if (actorLogin !== 'dependabot[bot]' && actorType !== 'Bot') return
 
-  try {
-    if (
-      ['test', 'test / test'].includes(name.toLowerCase()) &&
-      status === 'completed' &&
-      conclusion === 'success' &&
-      slug === 'github-actions' &&
-      prs.length === 1
-    ) {
-      const {
-        number,
-        head: {ref: headref, sha},
-        base: {ref: baseref},
-      } = prs[0]
+  // const {owner, repo} = context.repo()
 
-      if (baseref !== 'main' || !headref.includes('dependabot')) return
+  // try {
+  //   if (
+  //     ['test', 'test / test'].includes(name.toLowerCase()) &&
+  //     status === 'completed' &&
+  //     conclusion === 'success' &&
+  //     slug === 'github-actions' &&
+  //     prs.length === 1
+  //   ) {
+  //     const {
+  //       number,
+  //       head: {ref: headref, sha},
+  //       base: {ref: baseref},
+  //     } = prs[0]
 
-      await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
-        owner,
-        repo,
-        pull_number: number,
-        commit_id: sha,
-        event: 'APPROVE',
-        body: `_🤖 auto-approved_`,
-      })
+  //     if (baseref !== 'main' || !headref.includes('dependabot')) return
 
-      context.log.info(`🤖 auto-approved ${owner}/${repo}#${number}`)
-    }
-  } catch (error) {
-    context.log.warn(`❌ auto-approve failed for ${owner}/${repo}`)
-    context.log.error(error.message)
+  //     await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
+  //       owner,
+  //       repo,
+  //       pull_number: number,
+  //       commit_id: sha,
+  //       event: 'APPROVE',
+  //       body: `_🤖 auto-approved_`,
+  //     })
 
-    throw error
-  }
+  //     context.log.info(`🤖 auto-approved ${owner}/${repo}#${number}`)
+  //   }
+  // } catch (error) {
+  //   context.log.warn(`❌ auto-approve failed for ${owner}/${repo}`)
+  //   context.log.error(error.message)
+
+  //   throw error
+  // }
 }
 
 module.exports = {
