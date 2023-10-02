@@ -28,10 +28,10 @@
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.6",
-    "@vercel/node": "^3.0.3",
-    "eslint": "^8.48.0",
+    "@vercel/node": "^3.0.6",
+    "eslint": "^8.50.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-github": "^4.10.0",
+    "eslint-plugin-github": "^4.10.1",
     "husky": "^8.0.3",
     "nodemon": "^3.0.1",
     "smee-client": "^1.2.3"
