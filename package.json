@@ -24,17 +24,17 @@
     "test": "eslint ."
   },
   "dependencies": {
-    "probot": "^12.3.1"
+    "probot": "^12.3.3"
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.6",
-    "@vercel/node": "^3.0.7",
-    "eslint": "^8.52.0",
+    "@vercel/node": "^3.0.11",
+    "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-github": "^4.10.1",
     "husky": "^8.0.3",
     "nodemon": "^3.0.1",
-    "smee-client": "^1.2.3"
+    "smee-client": "^2.0.0"
   },
   "husky": {
     "hooks": {
